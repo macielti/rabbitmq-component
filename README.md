@@ -1,3 +1,6 @@
+[![Clojars Project](https://img.shields.io/clojars/v/net.clojars.macielti/rabbitmq-component.svg)](https://clojars.org/net.clojars.macielti/rabbitmq-component)
+![Compatible with GraalVM](https://img.shields.io/badge/compatible_with-GraalVM-green)
+
 # RabbitMQ Component
 
 RabbitMQ Integrant component.

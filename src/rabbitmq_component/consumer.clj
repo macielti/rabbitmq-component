@@ -12,8 +12,9 @@
   (:import (clojure.lang IFn)))
 
 (s/defschema Consumers
-  {s/Str {:schema     s/Any
-          :handler-fn IFn}})
+  {s/Str {:schema       s/Any
+          :interceptors [s/Any]
+          :handler-fn   IFn}})
 
 (defn handler-fn->interceptor
   [handler-fn]

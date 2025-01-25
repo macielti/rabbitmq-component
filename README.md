@@ -5,6 +5,10 @@
 
 RabbitMQ Integrant component.
 
+## How to Use
+
+[Example of Usage.](./doc/example.md)
+
 ## License
 
 Copyright © 2025 Bruno do Nascimento Maciel

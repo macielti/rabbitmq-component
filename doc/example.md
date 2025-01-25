@@ -16,7 +16,8 @@ messga to it.
          '[schema.core :as s]
          '[integrant.core :as ig]
          '[taoensso.timbre :as timbre]
-         '[taoensso.timbre.tools.logging])
+         '[taoensso.timbre.tools.logging]
+         '[java-time.api :as jt])
 
 (taoensso.timbre.tools.logging/use-timbre)
 (timbre/set-min-level! :debug)
@@ -29,7 +30,10 @@ messga to it.
 (def consumers {"test_topic" {:interceptors []
                               :schema       s/Any
                               :handler-fn   (fn [{:keys [_components payload]}]
-                                              (log/info ::consuming-message :payload payload))}})
+                                              (log/info ::consuming-message :payload payload
+                                                                            :as-of-local-date-time? (-> payload 
+                                                                                                        :as-of 
+                                                                                                        jt/local-date-time?)))}})
 
 (def system-setup
   {::component.producer/rabbitmq-producer {:components {:config config}}
@@ -39,6 +43,7 @@ messga to it.
 (def started-system (ig/init system-setup))
 
 (component.producer/produce! {:topic   "test_topic"
-                              :payload {:hello :world}}
+                              :payload {:hello :world
+                                        :as-of (jt/local-date-time)}}
                              (::component.producer/rabbitmq-producer started-system))
 ```

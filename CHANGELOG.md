@@ -9,6 +9,10 @@ of [keepachangelog.com](http://keepachangelog.com/).
 
 - Added `:interceptors` property for consumers definition schema.
 
+### Changed
+
+- Using `Nippy` for message serialization/de-serialization.
+
 ## 0.1.0 - 2025-01-23
 
 ### Added

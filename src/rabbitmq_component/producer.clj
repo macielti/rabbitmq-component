@@ -5,6 +5,7 @@
             [langohr.basic :as lb]
             [langohr.channel :as lch]
             [langohr.core :as rmq]
+            [taoensso.nippy :as nippy]
             [schema.core :as s]))
 
 (defmulti produce!
@@ -16,7 +17,7 @@
    {:keys [channel]}]
   (let [payload' (assoc payload :meta {:correlation-id (-> (common-traceability/current-correlation-id)
                                                            common-traceability/correlation-id-appended)})]
-    (lb/publish channel "" topic (prn-str payload') {:persistent true})))
+    (lb/publish channel "" topic (nippy/freeze-to-string payload') {:persistent true})))
 
 (defmethod ig/init-key ::rabbitmq-producer
   [_ {:keys [components]}]

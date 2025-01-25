@@ -1,6 +1,5 @@
 (ns rabbitmq-component.consumer
   (:require [clojure.tools.logging :as log]
-            [clojure.tools.reader.edn :as edn]
             [integrant.core :as ig]
             [io.pedestal.interceptor :as interceptor]
             [io.pedestal.interceptor.chain :as chain]
@@ -8,6 +7,7 @@
             [langohr.consumers :as lc]
             [langohr.core :as rmq]
             [langohr.queue :as lq]
+            [taoensso.nippy :as nippy]
             [schema.core :as s])
   (:import (clojure.lang IFn)))
 
@@ -19,8 +19,8 @@
 (defn handler-fn->interceptor
   [handler-fn]
   (interceptor/interceptor
-   {:name  ::consumer-handler-fn-interceptor
-    :enter handler-fn}))
+    {:name  ::consumer-handler-fn-interceptor
+     :enter handler-fn}))
 
 (defmethod ig/init-key ::rabbitmq-consumer
   [_ {:keys [consumers components]}]
@@ -40,8 +40,8 @@
       (dotimes [_n (or parallel-consumers 4)]
         (lc/subscribe channel title (fn [_channel _meta payload]
                                       (try
-                                        (s/validate schema (-> (String. payload "UTF-8") edn/read-string (dissoc :meta)))
-                                        (chain/execute {:payload    (edn/read-string (String. payload "UTF-8"))
+                                        (s/validate schema (-> (nippy/thaw-from-string (String. payload "UTF-8")) (dissoc :meta)))
+                                        (chain/execute {:payload    (nippy/thaw-from-string (String. payload "UTF-8"))
                                                         :components components}
                                                        (conj (or interceptors []) (handler-fn->interceptor handler-fn)))
                                         (catch Exception ex

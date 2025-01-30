@@ -1,4 +1,4 @@
-(defproject net.clojars.macielti/rabbitmq-component "0.1.1"
+(defproject net.clojars.macielti/rabbitmq-component "0.1.2"
 
   :description "RabbitMQ Integrant Components"
 
@@ -13,7 +13,7 @@
                  [io.pedestal/pedestal.interceptor "0.7.2"]
                  [org.clojure/tools.logging "1.3.0"]
                  [com.novemberain/langohr "5.5.0"]
-                 [net.clojars.macielti/common-clj "42.74.74"]
+                 [net.clojars.macielti/common-clj "43.74.74"]
                  [com.taoensso/nippy "3.5.0-RC1"]]
 
   :profiles {:dev {:test-paths   ^:replace ["test/unit" "test/integration" "test/helpers"]

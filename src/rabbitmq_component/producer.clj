@@ -1,12 +1,12 @@
 (ns rabbitmq-component.producer
   (:require [clojure.tools.logging :as log]
-            [common-clj.traceability.core :as common-traceability]
+            [common-clj.traceability.core :as traceability]
             [integrant.core :as ig]
             [langohr.basic :as lb]
             [langohr.channel :as lch]
             [langohr.core :as rmq]
-            [taoensso.nippy :as nippy]
-            [schema.core :as s]))
+            [schema.core :as s]
+            [taoensso.nippy :as nippy]))
 
 (defmulti produce!
   (fn [_ {:keys [current-env]}]
@@ -15,8 +15,7 @@
 (s/defmethod produce! :prod
   [{:keys [topic payload]}
    {:keys [channel]}]
-  (let [payload' (assoc payload :meta {:correlation-id (-> (common-traceability/current-correlation-id)
-                                                           common-traceability/correlation-id-appended)})]
+  (let [payload' (assoc payload :meta {:correlation-id (traceability/current-correlation-id!)})]
     (lb/publish channel "" topic (nippy/freeze-to-string payload') {:persistent true})))
 
 (defmethod ig/init-key ::rabbitmq-producer

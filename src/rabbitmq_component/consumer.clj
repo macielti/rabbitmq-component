@@ -7,8 +7,8 @@
             [langohr.consumers :as lc]
             [langohr.core :as rmq]
             [langohr.queue :as lq]
-            [taoensso.nippy :as nippy]
-            [schema.core :as s])
+            [schema.core :as s]
+            [taoensso.nippy :as nippy])
   (:import (clojure.lang IFn)))
 
 (s/defschema Consumers
@@ -19,8 +19,10 @@
 (defn handler-fn->interceptor
   [handler-fn]
   (interceptor/interceptor
-    {:name  ::consumer-handler-fn-interceptor
-     :enter handler-fn}))
+   {:name  ::consumer-handler-fn-interceptor
+    :enter (fn [context]
+             (handler-fn context)
+             context)}))
 
 (defmethod ig/init-key ::rabbitmq-consumer
   [_ {:keys [consumers components]}]

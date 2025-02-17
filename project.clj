@@ -1,4 +1,4 @@
-(defproject net.clojars.macielti/rabbitmq-component "0.1.2"
+(defproject net.clojars.macielti/rabbitmq-component "0.1.2-4"
 
   :description "RabbitMQ Integrant Components"
 
@@ -19,7 +19,7 @@
   :profiles {:dev {:test-paths   ^:replace ["test/unit" "test/integration" "test/helpers"]
 
                    :plugins      [[lein-cloverage "1.2.4"]
-                                  [com.github.clojure-lsp/lein-clojure-lsp "1.4.16"]
+                                  [com.github.clojure-lsp/lein-clojure-lsp "1.4.17"]
                                   [com.github.liquidz/antq "RELEASE"]]
 
                    :dependencies [[hashp "0.2.2"]]

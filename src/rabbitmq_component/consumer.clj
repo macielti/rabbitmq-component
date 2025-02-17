@@ -3,6 +3,7 @@
             [integrant.core :as ig]
             [io.pedestal.interceptor :as interceptor]
             [io.pedestal.interceptor.chain :as chain]
+            [langohr.basic :as lb]
             [langohr.channel :as lch]
             [langohr.consumers :as lc]
             [langohr.core :as rmq]
@@ -40,15 +41,17 @@
                   handler-fn (get-in consumers [title :handler-fn])]]
       (lq/declare channel title {:exclusive false :auto-delete false})
       (dotimes [_n (or parallel-consumers 4)]
-        (lc/subscribe channel title (fn [_channel _meta payload]
+        (lc/subscribe channel title (fn [_channel meta payload]
                                       (try
                                         (s/validate schema (-> (nippy/thaw-from-string (String. payload "UTF-8")) (dissoc :meta)))
                                         (chain/execute {:payload    (nippy/thaw-from-string (String. payload "UTF-8"))
                                                         :components components}
                                                        (conj (or interceptors []) (handler-fn->interceptor handler-fn)))
                                         (catch Exception ex
-                                          (log/error ::error-while-consuming-message :exception ex))))
-                      {:auto-ack true})))
+                                          (log/error ::error-while-consuming-message :exception ex)
+                                          (throw ex)))
+                                      (lb/ack channel (:delivery-tag meta)))
+                      {:auto-ack false})))
     {:channel    channel
      :connection connection}))
 

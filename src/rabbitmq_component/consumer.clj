@@ -39,7 +39,9 @@
             :let [schema (get-in consumers [title :schema])
                   interceptors (get-in consumers [title :interceptors])
                   handler-fn (get-in consumers [title :handler-fn])]]
-      (lq/declare channel title {:exclusive false :auto-delete false})
+      (lq/declare channel title {:exclusive   false
+                                 :auto-delete false
+                                 :durable     true})
       (dotimes [_n (or parallel-consumers 4)]
         (lc/subscribe channel title (fn [_channel meta payload]
                                       (try

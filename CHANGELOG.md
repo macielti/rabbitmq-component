@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions
 of [keepachangelog.com](http://keepachangelog.com/).
 
+## 0.1.2-5 - 2025-02-17 (beta)
+
+### Changed
+
+- Declare all queues as durable so rabbitmq can recover from crash without losing messages and queues.
+
 ## 0.1.2-4 - 2025-02-17 (beta)
 
 ### Changed

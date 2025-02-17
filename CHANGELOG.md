@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions
 of [keepachangelog.com](http://keepachangelog.com/).
 
+## 0.1.2-6 - 2025-02-17 (beta)
+
+### Changed
+
+- Explicitly reject and requeue messages when the handler throws an exception.
+
 ## 0.1.2-5 - 2025-02-17 (beta)
 
 ### Changed

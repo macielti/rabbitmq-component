@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions
 of [keepachangelog.com](http://keepachangelog.com/).
 
+## 0.1.2-4 - 2025-02-17 (beta)
+
+### Changed
+
+- Using manual ack for message consumption, so when the message is not processed successfully, it will be re-queued
+  automatically.
+
 ## 0.1.2 - 2025-01-30
 
 ### Fixed

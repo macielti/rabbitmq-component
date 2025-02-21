@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions
 of [keepachangelog.com](http://keepachangelog.com/).
 
+## 0.1.2-7 - 2025-02-21 (beta)
+
+### Fixed
+
+- Each message consumer should have its own channel.
+
 ## 0.1.2-6 - 2025-02-17 (beta)
 
 ### Changed

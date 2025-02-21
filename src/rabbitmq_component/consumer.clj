@@ -43,18 +43,19 @@
                                  :auto-delete false
                                  :durable     true})
       (dotimes [_n (or parallel-consumers 4)]
-        (lc/subscribe channel title (fn [_channel meta payload]
-                                      (try
-                                        (s/validate schema (-> (nippy/thaw-from-string (String. payload "UTF-8")) (dissoc :meta)))
-                                        (chain/execute {:payload    (nippy/thaw-from-string (String. payload "UTF-8"))
-                                                        :components components}
-                                                       (conj (or interceptors []) (handler-fn->interceptor handler-fn)))
-                                        (catch Exception ex
-                                          (log/error ::error-while-consuming-message :exception ex)
-                                          (lb/reject channel (:delivery-tag meta) true)
-                                          (throw ex)))
-                                      (lb/ack channel (:delivery-tag meta)))
-                      {:auto-ack false})))
+        (let [consumer-channel (lch/open connection)]
+          (lc/subscribe consumer-channel title (fn [handler-channel meta payload]
+                                                 (try
+                                                   (s/validate schema (-> (nippy/thaw-from-string (String. payload "UTF-8")) (dissoc :meta)))
+                                                   (chain/execute {:payload    (nippy/thaw-from-string (String. payload "UTF-8"))
+                                                                   :components components}
+                                                                  (conj (or interceptors []) (handler-fn->interceptor handler-fn)))
+                                                   (catch Exception ex
+                                                     (log/error ::error-while-consuming-message :exception ex)
+                                                     (lb/reject handler-channel (:delivery-tag meta) true)
+                                                     (throw ex)))
+                                                 (lb/ack handler-channel (:delivery-tag meta)))
+                        {:auto-ack false}))))
     {:channel    channel
      :connection connection}))
 

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions
 of [keepachangelog.com](http://keepachangelog.com/).
 
+## 0.2.0 - 2026-02-27
+
+### Added
+
+- Add unit tests.
+
+### Changed
+
+- Improve support for integration tests.
+
 ## 0.1.2-7 - 2025-02-21 (beta)
 
 ### Fixed
@@ -52,4 +62,3 @@ of [keepachangelog.com](http://keepachangelog.com/).
 ### Added
 
 - Initial release.
-

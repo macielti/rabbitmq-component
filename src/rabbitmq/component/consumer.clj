@@ -1,4 +1,4 @@
-(ns rabbitmq-component.consumer
+(ns rabbitmq.component.consumer
   (:require [clojure.tools.logging :as log]
             [integrant.core :as ig]
             [io.pedestal.interceptor :as interceptor]
@@ -20,16 +20,19 @@
 (defn handler-fn->interceptor
   [handler-fn]
   (interceptor/interceptor
-    {:name  ::consumer-handler-fn-interceptor
-     :enter (fn [context]
-              (handler-fn context)
-              context)}))
+   {:name  ::consumer-handler-fn-interceptor
+    :enter (fn [context]
+             (handler-fn context)
+             context)}))
 
 (defmethod ig/init-key ::rabbitmq-consumer
   [_ {:keys [consumers components]}]
   (log/info :starting ::rabbitmq-consumer)
-  (let [topics (-> components :config :topics)
-        uri (-> components :config :rabbitmq-uri)
+  (let [current-env (-> components :config :current-env)
+        topics (-> components :config :topics)
+        uri (case current-env
+              :prod (-> components :config :rabbitmq-uri)
+              :test (-> components :rabbitmq-container :url))
         connection (rmq/connect {:uri uri})
         channel (lch/open connection)]
 

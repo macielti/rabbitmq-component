@@ -10,8 +10,8 @@ The following code is a minimal setup for the RabbitMQ Integrant Component, sett
 messga to it.
 
 ```clojure
-(require '[rabbitmq-component.consumer :as component.consumer]
-         '[rabbitmq-component.producer :as component.producer]
+(require '[rabbitmq.component.consumer :as component.consumer]
+         '[rabbitmq.component.producer :as component.producer]
          '[clojure.tools.logging :as log]
          '[schema.core :as s]
          '[integrant.core :as ig]

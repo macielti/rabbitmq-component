@@ -20,10 +20,10 @@
 (defn handler-fn->interceptor
   [handler-fn]
   (interceptor/interceptor
-   {:name  ::consumer-handler-fn-interceptor
-    :enter (fn [context]
-             (handler-fn context)
-             context)}))
+    {:name  ::consumer-handler-fn-interceptor
+     :enter (fn [context]
+              (handler-fn context)
+              context)}))
 
 (defmethod ig/init-key ::rabbitmq-consumer
   [_ {:keys [consumers components]}]
@@ -54,7 +54,7 @@
                                                                    :components components}
                                                                   (conj (or interceptors []) (handler-fn->interceptor handler-fn)))
                                                    (catch Exception ex
-                                                     (log/error ::error-while-consuming-message :exception ex)
+                                                     (log/error ::error-while-consuming-message :topic title :exception ex)
                                                      (lb/reject handler-channel (:delivery-tag meta) true)
                                                      (throw ex)))
                                                  (lb/ack handler-channel (:delivery-tag meta)))

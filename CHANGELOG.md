@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions
 of [keepachangelog.com](http://keepachangelog.com/).
 
+## 0.2.1 - 2026-03-01
+
+### Added
+
+- Added the topic to the log message when consumption fails.
+
 ## 0.2.0 - 2026-02-27
 
 ### Added

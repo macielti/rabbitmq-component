@@ -20,10 +20,10 @@
 (defn handler-fn->interceptor
   [handler-fn]
   (interceptor/interceptor
-    {:name  ::consumer-handler-fn-interceptor
-     :enter (fn [context]
-              (handler-fn context)
-              context)}))
+   {:name  ::consumer-handler-fn-interceptor
+    :enter (fn [context]
+             (handler-fn context)
+             context)}))
 
 (defmethod ig/init-key ::rabbitmq-consumer
   [_ {:keys [consumers components]}]

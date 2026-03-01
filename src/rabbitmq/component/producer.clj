@@ -7,7 +7,15 @@
             [langohr.core :as rmq]
             [medley.core :as misc]
             [schema.core :as s]
-            [taoensso.nippy :as nippy]))
+            [taoensso.nippy :as nippy])
+  (:import (com.novemberain.langohr Connection)
+           (com.rabbitmq.client.impl.recovery AutorecoveringChannel)))
+
+(s/defschema RabbitMQProducerComponent
+  {:channel                            AutorecoveringChannel
+   :connection                         Connection
+   :current-env                        (s/enum :prod :test)
+   (s/optional-key :produced-messages) (s/maybe (s/atom [(s/pred map? "Produced message in test environment")]))})
 
 (defmulti produce!
   (fn [_ {:keys [current-env]}]

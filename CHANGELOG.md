@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions
 of [keepachangelog.com](http://keepachangelog.com/).
 
+## 0.2.2 - 2026-03-01
+
+### Added
+
+- Added schema for the producer component.
+
 ## 0.2.1 - 2026-03-01
 
 ### Added

@@ -5,6 +5,7 @@
             [java-time.api :as jt]
             [matcher-combinators.test :refer [match?]]
             [rabbitmq.component.producer :as component.producer]
+            [schema.core :as s]
             [schema.core :as schema]
             [schema.test :as st]))
 
@@ -32,6 +33,10 @@
       (component.producer/produce! message producer)
 
       (Thread/sleep 1000)
+
+      (testing "The producer component respect the schema"
+        (is (= producer
+               (s/validate component.producer/RabbitMQProducerComponent producer))))
 
       (is (= [message]
              (component.producer/produced-messages producer)))

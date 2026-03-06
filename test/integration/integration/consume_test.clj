@@ -1,5 +1,5 @@
 (ns integration.consume-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.test :refer [is testing]]
             [hashp.core]
             [integration.aux.components :as aux.components]
             [java-time.api :as jt]
@@ -7,14 +7,13 @@
             [rabbitmq.component.consumer :as component.consumer]
             [rabbitmq.component.producer :as component.producer]
             [schema.core :as s]
-            [schema.core :as schema]
             [schema.test :as st]))
 
 (def test-context (atom nil))
 (def as-of (jt/instant))
 
 (def consumers
-  {"test_topic" {:schema       schema/Any
+  {"test_topic" {:schema       s/Any
                  :interceptors []
                  :handler-fn   (fn [context] (reset! test-context (:payload context)))}})
 

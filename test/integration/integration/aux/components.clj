@@ -1,6 +1,5 @@
 (ns integration.aux.components
-  (:require [clojure.test :refer :all]
-            [common-test-clj.component.rabbitmq.container :as component.rabbitmq-container]
+  (:require [common-test-clj.component.rabbitmq.container :as component.rabbitmq-container]
             [integrant.core :as ig]
             [rabbitmq.component.consumer :as component.consumer]
             [rabbitmq.component.producer :as component.producer]

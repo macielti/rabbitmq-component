@@ -40,15 +40,14 @@
    Options:
      :timeout-ms - Maximum time to wait in milliseconds (default: 10000)"
   [consumer expected-count & {:keys [timeout-ms] :or {timeout-ms 10000}}]
-  (let [start (System/currentTimeMillis)]
-    (loop []
-      (let [current (or (consumed-count consumer) 0)]
-        (when (< current expected-count)
-          (if (> (- (System/currentTimeMillis) start) timeout-ms)
-            (throw (ex-info "Timeout waiting for messages to be consumed"
-                            {:expected expected-count :consumed current :timeout-ms timeout-ms}))
-            (do (Thread/sleep 100)
-                (recur))))))))
+  (loop [start (System/currentTimeMillis)]
+    (let [current (or (consumed-count consumer) 0)]
+      (when (< current expected-count)
+        (if (> (- (System/currentTimeMillis) start) timeout-ms)
+          (throw (ex-info "Timeout waiting for messages to be consumed"
+                          {:expected expected-count :consumed current :timeout-ms timeout-ms}))
+          (do (Thread/sleep 100)
+              (recur start)))))))
 
 (defmethod ig/init-key ::rabbitmq-consumer
   [_ {:keys [consumers components]}]

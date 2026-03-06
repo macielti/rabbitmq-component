@@ -34,7 +34,8 @@
 
       (component.producer/produce! message producer)
 
-      (component.consumer/wait-for-consumption! consumer (count (component.producer/produced-messages producer)))
+      (let [expected-message-count (count (component.producer/produced-messages producer))]
+        (component.consumer/wait-for-consumption! consumer expected-message-count))
 
       (testing "The producer component respect the schema"
         (is (= producer

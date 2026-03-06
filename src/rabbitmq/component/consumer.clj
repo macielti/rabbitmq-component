@@ -8,6 +8,7 @@
             [langohr.consumers :as lc]
             [langohr.core :as rmq]
             [langohr.queue :as lq]
+            [medley.core :as misc]
             [schema.core :as s]
             [taoensso.nippy :as nippy])
   (:import (clojure.lang IFn)))
@@ -34,7 +35,8 @@
               :prod (-> components :config :rabbitmq-uri)
               :test (-> components :rabbitmq-container :url))
         connection (rmq/connect {:uri uri})
-        channel (lch/open connection)]
+        channel (lch/open connection)
+        consumed-count (when (= current-env :test) (atom 0))]
 
     (s/validate Consumers consumers)
 
@@ -57,10 +59,39 @@
                                                      (log/error ::error-while-consuming-message :topic title :exception ex)
                                                      (lb/reject handler-channel (:delivery-tag meta) true)
                                                      (throw ex)))
-                                                 (lb/ack handler-channel (:delivery-tag meta)))
+                                                 (lb/ack handler-channel (:delivery-tag meta))
+                                                 (when consumed-count
+                                                   (swap! consumed-count inc)))
                         {:auto-ack false}))))
-    {:channel    channel
-     :connection connection}))
+    (misc/assoc-some {:channel    channel
+                      :connection connection}
+                     :consumed-count consumed-count)))
+
+(defn wait-for-consumption!
+  "Waits until all produced messages have been consumed in test environment.
+   Takes a producer component and a consumer component.
+   Polls every 100ms until consumed count >= produced messages count.
+   Times out after the specified timeout in milliseconds (default: 5000ms).
+   Returns true if all messages were consumed, throws an exception on timeout."
+  ([producer consumer]
+   (wait-for-consumption! producer consumer 5000))
+  ([producer consumer timeout-ms]
+   (let [start-time (System/currentTimeMillis)
+         consumed (fn [] (if-let [consumed-count (:consumed-count consumer)]
+                           @consumed-count
+                           0))
+         produced (fn [] (count @(:produced-messages producer)))]
+     (loop []
+       (if (>= (consumed) (produced))
+         true
+         (if (> (- (System/currentTimeMillis) start-time) timeout-ms)
+           (throw (ex-info "Timeout waiting for message consumption"
+                           {:produced-count (produced)
+                            :consumed-count (consumed)
+                            :timeout-ms     timeout-ms}))
+           (do
+             (Thread/sleep 100)
+             (recur))))))))
 
 (defmethod ig/halt-key! ::rabbitmq-consumer
   [_ rabbitmq-consumer]

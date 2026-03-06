@@ -1,19 +1,19 @@
 (ns integration.consume-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.test :refer [is testing]]
             [hashp.core]
             [integration.aux.components :as aux.components]
             [java-time.api :as jt]
             [matcher-combinators.test :refer [match?]]
+            [rabbitmq.component.consumer :as component.consumer]
             [rabbitmq.component.producer :as component.producer]
             [schema.core :as s]
-            [schema.core :as schema]
             [schema.test :as st]))
 
 (def test-context (atom nil))
 (def as-of (jt/instant))
 
 (def consumers
-  {"test_topic" {:schema       schema/Any
+  {"test_topic" {:schema       s/Any
                  :interceptors []
                  :handler-fn   (fn [context] (reset! test-context (:payload context)))}})
 
@@ -26,13 +26,15 @@
   (testing "We can consume messages from RabbitMQ"
     (let [system (aux.components/start-system! consumers config)
           producer (get system ::component.producer/rabbitmq-producer)
+          consumer (get system ::component.consumer/rabbitmq-consumer)
           message {:topic   "test_topic"
                    :payload {:foo        "bar"
                              :created-at as-of}}]
 
       (component.producer/produce! message producer)
 
-      (Thread/sleep 1000)
+      (let [expected-message-count (count (component.producer/produced-messages producer))]
+        (component.consumer/wait-for-consumption! consumer expected-message-count))
 
       (testing "The producer component respect the schema"
         (is (= producer

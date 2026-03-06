@@ -70,16 +70,18 @@
 (defn wait-for-consumption!
   "Waits until all produced messages have been consumed in test environment.
    Takes a producer component and a consumer component.
+   Should be called after all produce! calls have been made.
    Polls every 100ms until consumed count >= produced messages count.
    Times out after the specified timeout in milliseconds (default: 5000ms).
    Returns true if all messages were consumed, throws an exception on timeout."
   ([producer consumer]
    (wait-for-consumption! producer consumer 5000))
   ([producer consumer timeout-ms]
+   (when-not (:consumed-count consumer)
+     (throw (ex-info "wait-for-consumption! can only be used in test environment"
+                     {:consumer consumer})))
    (let [start-time (System/currentTimeMillis)
-         consumed (fn [] (if-let [consumed-count (:consumed-count consumer)]
-                           @consumed-count
-                           0))
+         consumed (fn [] @(:consumed-count consumer))
          produced (fn [] (count @(:produced-messages producer)))]
      (loop []
        (if (>= (consumed) (produced))

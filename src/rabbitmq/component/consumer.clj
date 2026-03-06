@@ -8,6 +8,7 @@
             [langohr.consumers :as lc]
             [langohr.core :as rmq]
             [langohr.queue :as lq]
+            [medley.core :as misc]
             [schema.core :as s]
             [taoensso.nippy :as nippy])
   (:import (clojure.lang IFn)))
@@ -25,6 +26,30 @@
              (handler-fn context)
              context)}))
 
+(defn consumed-count
+  "Returns the number of consumed messages in test environment.
+   Returns nil in production environment."
+  [{:keys [consumed-count]}]
+  (when consumed-count
+    @consumed-count))
+
+(defn wait-for-consumption!
+  "Waits until the number of consumed messages reaches the expected count.
+   Useful in integration tests to ensure all produced messages have been consumed
+   before proceeding with assertions.
+   Options:
+     :timeout-ms - Maximum time to wait in milliseconds (default: 10000)"
+  [consumer expected-count & {:keys [timeout-ms] :or {timeout-ms 10000}}]
+  (let [start (System/currentTimeMillis)]
+    (loop []
+      (let [current (or (consumed-count consumer) 0)]
+        (when (< current expected-count)
+          (if (> (- (System/currentTimeMillis) start) timeout-ms)
+            (throw (ex-info "Timeout waiting for messages to be consumed"
+                            {:expected expected-count :consumed current :timeout-ms timeout-ms}))
+            (do (Thread/sleep 100)
+                (recur))))))))
+
 (defmethod ig/init-key ::rabbitmq-consumer
   [_ {:keys [consumers components]}]
   (log/info :starting ::rabbitmq-consumer)
@@ -34,7 +59,8 @@
               :prod (-> components :config :rabbitmq-uri)
               :test (-> components :rabbitmq-container :url))
         connection (rmq/connect {:uri uri})
-        channel (lch/open connection)]
+        channel (lch/open connection)
+        consumed-count (when (= current-env :test) (atom 0))]
 
     (s/validate Consumers consumers)
 
@@ -57,10 +83,13 @@
                                                      (log/error ::error-while-consuming-message :topic title :exception ex)
                                                      (lb/reject handler-channel (:delivery-tag meta) true)
                                                      (throw ex)))
-                                                 (lb/ack handler-channel (:delivery-tag meta)))
+                                                 (lb/ack handler-channel (:delivery-tag meta))
+                                                 (when consumed-count
+                                                   (swap! consumed-count inc)))
                         {:auto-ack false}))))
-    {:channel    channel
-     :connection connection}))
+    (misc/assoc-some {:channel    channel
+                      :connection connection}
+                     :consumed-count consumed-count)))
 
 (defmethod ig/halt-key! ::rabbitmq-consumer
   [_ rabbitmq-consumer]

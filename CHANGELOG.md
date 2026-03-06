@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions
 of [keepachangelog.com](http://keepachangelog.com/).
 
+## 0.2.3 - 2026-03-06
+
+### Added
+
+- Added `consumed-count` function to the consumer component to track the number of consumed messages in test environment.
+- Added `wait-for-consumption!` function to the consumer component to wait until all produced messages have been consumed in integration tests.
+
 ## 0.2.2 - 2026-03-01
 
 ### Added

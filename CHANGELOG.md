@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions
 of [keepachangelog.com](http://keepachangelog.com/).
 
+## 0.3.0 - 2026-04-21
+
+### Added
+
+- Wrap RabbitMQ connection creation in producer and consumer components with `diehard` retry (3 attempts, 1–15s backoff) to survive transient broker unavailability at startup.
+
 ## 0.2.3 - 2026-03-06
 
 ### Added

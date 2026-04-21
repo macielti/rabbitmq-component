@@ -1,5 +1,6 @@
 (ns rabbitmq.component.consumer
   (:require [clojure.tools.logging :as log]
+            [diehard.core :as dh]
             [integrant.core :as ig]
             [io.pedestal.interceptor :as interceptor]
             [io.pedestal.interceptor.chain :as chain]
@@ -57,7 +58,12 @@
         uri (case current-env
               :prod (-> components :config :rabbitmq-uri)
               :test (-> components :rabbitmq-container :url))
-        connection (rmq/connect {:uri uri})
+        connection (dh/with-retry {:max-retries 3
+                                   :backoff-ms  [1000 15000]
+                                   :retry-on    Exception
+                                   :on-retry    (fn [_ _]
+                                                  (log/warn :retrying-rabbitmq-consumer-connection))}
+                     (rmq/connect {:uri uri}))
         channel (lch/open connection)
         consumed-count (when (= current-env :test) (atom 0))]
 

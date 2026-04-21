@@ -1,6 +1,7 @@
 (ns rabbitmq.component.producer
   (:require [clojure.tools.logging :as log]
             [common-clj.traceability.core :as traceability]
+            [diehard.core :as dh]
             [integrant.core :as ig]
             [langohr.basic :as lb]
             [langohr.channel :as lch]
@@ -48,7 +49,12 @@
         uri (case current-env
               :prod (-> components :config :rabbitmq-uri)
               :test (-> components :rabbitmq-container :url))
-        connection (rmq/connect {:uri uri})
+        connection (dh/with-retry {:max-retries 3
+                                   :backoff-ms  [1000 15000]
+                                   :retry-on    Exception
+                                   :on-retry    (fn [_ _]
+                                                  (log/warn :retrying-rabbitmq-producer-connection))}
+                     (rmq/connect {:uri uri}))
         channel (lch/open connection)]
     (misc/assoc-some {:connection  connection
                       :channel     channel

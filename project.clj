@@ -1,4 +1,4 @@
-(defproject net.clojars.macielti/rabbitmq "0.2.3"
+(defproject net.clojars.macielti/rabbitmq "0.3.0"
 
   :description "RabbitMQ Integrant Components"
 
@@ -13,6 +13,7 @@
                  [io.pedestal/pedestal.interceptor "0.8.1"]
                  [org.clojure/tools.logging "1.3.1"]
                  [com.novemberain/langohr "5.6.0"]
+                 [diehard "0.12.0"]
                  [net.clojars.macielti/common-clj "46.1.4"]
                  [com.taoensso/nippy "3.6.0"]
                  [org.testcontainers/rabbitmq "1.21.4"]]

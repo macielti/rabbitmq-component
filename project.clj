@@ -1,4 +1,4 @@
-(defproject net.clojars.macielti/rabbitmq "0.3.0"
+(defproject net.clojars.macielti/rabbitmq "0.3.1"
 
   :description "RabbitMQ Integrant Components"
 

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions
 of [keepachangelog.com](http://keepachangelog.com/).
 
+## 0.3.1 - 2026-04-21
+
+### Changed
+
+- Increase diehard `:max-retries` from 3 to 5 in producer and consumer connection setup so the exponential backoff actually reaches the configured 15s cap (~30s total retry window instead of ~7s).
+
 ## 0.3.0 - 2026-04-21
 
 ### Added

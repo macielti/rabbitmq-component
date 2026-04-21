@@ -49,7 +49,7 @@
         uri (case current-env
               :prod (-> components :config :rabbitmq-uri)
               :test (-> components :rabbitmq-container :url))
-        connection (dh/with-retry {:max-retries 3
+        connection (dh/with-retry {:max-retries 5
                                    :backoff-ms  [1000 15000]
                                    :retry-on    Exception
                                    :on-retry    (fn [_ _]
